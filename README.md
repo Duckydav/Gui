@@ -15,7 +15,7 @@ This expression can be used to improve workflow speed in complex Nuke scripts. B
 At line 14 of `gui.py`, you have the option to add or modify the names of the nodes you want the function to include.  
 Currently, it targets nodes with the names `Defocus`, `VectorBlur`, and `Denoise`.
 
----
+![gui_demo](https://github.com/user-attachments/assets/1785fa76-21ff-4db6-8b98-3093f818ef76)
 
 ## ***Installation***
 
