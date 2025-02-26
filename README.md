@@ -9,17 +9,18 @@ This expression can be used to improve workflow speed in complex Nuke scripts. B
 
 - **$Gui (Shortcut: Alt+D)**: On the selected node - Adds the `$gui` expression to the node's disable knob.
 - **$gui all (Shortcut: Alt+4)**: Multiple Nodes - Ensures nodes are dynamically disabled in GUI mode and enabled during rendering.
+- **$gui setting (Shortcut: Shift+Alt+D)**: Easily configure which nodes are affected in the script.
 
 ### Notes
 
 At line 14 of `gui.py`, you have the option to add or modify the names of the nodes you want the function to include.  
-Currently, it targets nodes with the names `Defocus`, `VectorBlur`, and `Denoise`.
+Currently, it targets nodes with the names `Defocus`, `Vecto rBlur`, and `Denoise`.
 
 ![gui_demo](https://github.com/user-attachments/assets/49d1194d-f4d2-4ff6-bdff-054c68465831)
 
 ## ***Installation***
 
-1. Place the `gui.py` file in the **`.nuke`** directory:
+1. Place the `gui.py` and `gui_settings.json` file in the **`.nuke`** directory:
    - **Windows**: `%HOME%/.nuke/`
    - **macOS/Linux**: `~/.nuke/`
 
