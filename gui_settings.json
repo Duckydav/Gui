@@ -1,8 +1,10 @@
 {
     "node_names": [
-        "defocus",
-        "vector",
+        "bokeh",
         "denoise",
-        "bokeh"
-    ]
+        "defocus",
+        "frameblend",
+        "vector"
+    ],
+    "filter_type": "name"
 }
