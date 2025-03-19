@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------------------------------------
-# $GUI v1.1
+# $GUI v1.2
 # Author: David Francois
 # Copyright (c) 2024, David Francois
 # ----------------------------------------------------------------------------------------------------------
@@ -13,14 +13,17 @@ SETTINGS_PATH = os.path.expanduser("~/.nuke/gui_settings.json")
 
 
 def load_settings():
-    # If the JSON file doesn't exist, create it with default values
     if not os.path.exists(SETTINGS_PATH):
-        initial_settings = {"node_names": ["defocus", "vector", "denoise"]}  # Default values
+        initial_settings = {
+            "node_names": ["defocus", "vector", "denoise"],
+            "filter_type": "name"
+        }
         save_settings(initial_settings)
         return initial_settings
-    # Load settings from the JSON file
+
     with open(SETTINGS_PATH, 'r') as file:
         return json.load(file)
+
 
 
 def save_settings(settings):
@@ -30,46 +33,58 @@ def save_settings(settings):
 
 
 def setting():
-    # Load current settings
     settings = load_settings()
     node_names = settings.get("node_names", [])
+    filter_type = settings.get("filter_type", "name")
 
-    # Configuration window
-    input_label = "<h2>Node's names</h2>\n\nto be affected by\n$gui in Disable\n\n(list separated by commas)"
+    # Rearrange the order of the choices so that the saved one is first
+    filter_options = ["name", "class"]
+    if filter_type == "class":
+        filter_options.reverse()
+
+    node_identifier_key = "Node Identifiers\n\n(list separated by commas)"
+
+    # UI Panel
     panel = nuke.Panel("$GUI Settings")
-    panel.addNotepad(input_label, ", ".join(node_names))
+    panel.addEnumerationPulldown("Filter by", " ".join(filter_options))
+    panel.addNotepad(node_identifier_key, ", ".join(node_names))  # Utiliser une clé exacte
 
     if panel.show():
-        # Update node names from user input
-        new_names = panel.value(input_label).strip().split(',')
-        settings["node_names"] = [name.strip().lower() for name in new_names if name.strip()]
+        new_filter_type = panel.value("Filter by")
+        new_identifiers = panel.value(node_identifier_key)  # Récupérer avec la bonne clé
+        if new_identifiers:
+            new_identifiers = new_identifiers.strip().split(',')
+        else:
+            new_identifiers = []
+
+        settings["filter_type"] = new_filter_type
+        settings["node_names"] = [name.strip().lower() for name in new_identifiers if name.strip()]
         save_settings(settings)
 
 
-# Disable or enable nodes based on their current state
 def run_all():
-    # Load settings and get node names
     settings = load_settings()
-    node_names = [name.lower() for name in settings.get("node_names", [])]
+    node_identifiers = [name.lower() for name in settings.get("node_names", [])]
+    filter_type = settings.get("filter_type", "name")
 
     for node in nuke.allNodes():
-        # Check if the node name matches any in the list
-        if any(x in node.name().lower() for x in node_names):
-            disable_knob = node['disable']
+        if filter_type == "name":
+            match = any(identifier in node.name().lower() for identifier in node_identifiers)
+        else:  # filter_type == "class"
+            match = any(identifier in node.Class().lower() for identifier in node_identifiers)
 
+        if match:
+            disable_knob = node['disable']
             if disable_knob.isAnimated():
-                # Clear animation and disable the node
                 disable_knob.clearAnimated()
                 disable_knob.setValue(0)
                 print(f"Animation cleared and {node.name()} disabled.")
             else:
-                # Add $gui expression and enable the node
                 disable_knob.setExpression("$gui")
                 disable_knob.setValue(1)
                 print(f"Expression $gui added and {node.name()} enabled.")
 
 
-# Manage the selected nodes in the scene
 def run():
     # Get selected nodes
     selected_nodes = nuke.selectedNodes()
